@@ -86,4 +86,14 @@ if st.button("🔮 Calcular Supervivencia"):
 # ==========================================
 # SECCIÓN DEL PIE DE PÁGINA (FOOTER)
 # ==========================================
-st.markdown("<br><br><br>", unsafe_allow_html=True) # Espaciado para empujar el pie
+st.markdown("<br><br><br>", unsafe_allow_html=True) # Espaciado para empujar el pie de página hacia abajo
+st.markdown("---")
+
+# Centramos el botón del enlace usando columnas
+col_left, col_center, col_right = st.columns([1, 2, 1])
+with col_center:
+    st.link_button(
+        label="🚀 Ir a Google Colab", 
+        url="https://colab.research.google.com/drive/1QIr9czxwDVD_K3PuQKgVbMEStDGq-tGm?usp=sharing",
+        use_container_width=True
+    )
