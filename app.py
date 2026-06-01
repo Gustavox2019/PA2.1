@@ -16,7 +16,6 @@ st.write("Introduce tus datos y averigua si habrías sobrevivido usando tus mode
 @st.cache_resource
 def load_model(model_name):
     try:
-        # joblib leerá correctamente el formato ya que los archivos fueron creados con él
         return joblib.load(model_name)
     except Exception as e:
         st.error(f"⚠️ Error al cargar {model_name}: {e}")
@@ -45,7 +44,7 @@ with col2:
 
 embarked = st.selectbox("Puerto de Embarque", ["Cherbourg (C)", "Queenstown (Q)", "Southampton (S)"], index=2)
 
-# Preprocesamiento de variables (Orden exacto requerido por tus modelos)
+# Preprocesamiento de variables
 sex_male = 1 if sex == "Masculino" else 0
 embarked_q = 1 if embarked == "Queenstown (Q)" else 0
 embarked_s = 1 if embarked == "Southampton (S)" else 0
@@ -68,15 +67,13 @@ st.markdown("---")
 if st.button("🔮 Calcular Supervivencia"):
     if model is not None:
         try:
-            # Predicción
             prediction = model.predict(input_data)[0]
             
-            # Mostrar resultados estilizados
             st.subheader("Resultado:")
             if prediction == 1:
-                st.success("🎉 ¡Felicidades! hubieras **SOBREVIVIDO** al desastre.")
+                st.success("🎉 ¡Felicidades! Según el modelo, hubieras **SOBREVIVIDO** al desastre.")
             else:
-                st.error("💔 Lamentablemente **NO HUBIERAS SOBREVIVIDO**.")
+                st.error("💔 Lamentablemente, según el modelo, **NO HUBIERAS SOBREVIVIDO**.")
                 
             with st.expander("Ver datos enviados al modelo"):
                 st.dataframe(input_data)
@@ -85,3 +82,8 @@ if st.button("🔮 Calcular Supervivencia"):
             st.error(f"Hubo un problema al procesar los datos con el modelo: {e}")
     else:
         st.warning("El modelo no está disponible actualmente debido al error de carga de arriba.")
+
+# ==========================================
+# SECCIÓN DEL PIE DE PÁGINA (FOOTER)
+# ==========================================
+st.markdown("<br><br><br>", unsafe_allow_html=True) # Espaciado para empujar el pie
