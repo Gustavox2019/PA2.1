@@ -74,9 +74,9 @@ if st.button("🔮 Calcular Supervivencia"):
             # Mostrar resultados estilizados
             st.subheader("Resultado:")
             if prediction == 1:
-                st.success("🎉 ¡Felicidades! Según el modelo, hubieras **SOBREVIVIDO** al desastre.")
+                st.success("🎉 ¡Felicidades! hubieras **SOBREVIVIDO** al desastre.")
             else:
-                st.error("💔 Lamentablemente, según el modelo, **NO HUBIERAS SOBREVIVIDO**.")
+                st.error("💔 Lamentablemente **NO HUBIERAS SOBREVIVIDO**.")
                 
             with st.expander("Ver datos enviados al modelo"):
                 st.dataframe(input_data)
