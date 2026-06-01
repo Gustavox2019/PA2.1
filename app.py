@@ -1,5 +1,5 @@
 import streamlit as st
-import pickle
+import joblib
 import pandas as pd
 
 # Configuración de la página
@@ -10,60 +10,78 @@ st.set_page_config(
 )
 
 st.title("🚢 ¿Sobrevivirías al Titanic?")
+st.write("Introduce tus datos y averigua si habrías sobrevivido usando tus modelos entrenados.")
 
-# Función de carga nativa con control de errores total
+# Función de carga definitiva utilizando joblib de forma nativa
 @st.cache_resource
 def load_model(model_name):
     try:
-        with open(model_name, "rb") as f:
-            return pickle.load(f)
+        # joblib leerá correctamente el formato ya que los archivos fueron creados con él
+        return joblib.load(model_name)
     except Exception as e:
-        # Esto evitará que la app colapse y te dirá exactamente qué falla en pantalla
-        st.error(f"Error al cargar {model_name}: {e}")
+        st.error(f"⚠️ Error al cargar {model_name}: {e}")
         return None
 
-# Barra lateral
-st.sidebar.header("Modelo")
+# Barra lateral para seleccionar el modelo
+st.sidebar.header("Configuración del Modelo")
 model_option = st.sidebar.selectbox("Selecciona el modelo:", ("Logistic Regression", "Random Forest"))
 model_file = "logistic_regression_model.pkl" if model_option == "Logistic Regression" else "random_forest_model.pkl"
 
 model = load_model(model_file)
 
-# Formulario
-st.header("📝 Tus Datos")
+# Formulario de entrada de datos
+st.header("📝 Tus Datos de Pasajero")
 col1, col2 = st.columns(2)
+
 with col1:
     sex = st.selectbox("Género", ["Masculino", "Femenino"])
     age = st.slider("Edad", 1, 100, 25)
-    pclass = st.selectbox("Clase", [1, 2, 3], index=2)
+    pclass = st.selectbox("Clase de Boleto (Pclass)", [1, 2, 3], index=2)
+
 with col2:
-    sibsp = st.number_input("Hermanos/Cónyuges (SibSp)", 0, 10, 0)
-    parch = st.number_input("Padres/Hijos (Parch)", 0, 10, 0)
-    fare = st.number_input("Precio Boleto (Fare)", 0.0, 600.0, 30.0)
+    sibsp = st.number_input("Hermanos/Cónyuges a bordo (SibSp)", 0, 10, 0)
+    parch = st.number_input("Padres/Hijos a bordo (Parch)", 0, 10, 0)
+    fare = st.number_input("Precio del Boleto (Fare)", 0.0, 600.0, 30.0)
 
-embarked = st.selectbox("Puerto", ["Cherbourg (C)", "Queenstown (Q)", "Southampton (S)"], index=2)
+embarked = st.selectbox("Puerto de Embarque", ["Cherbourg (C)", "Queenstown (Q)", "Southampton (S)"], index=2)
 
-# Preprocesamiento
+# Preprocesamiento de variables (Orden exacto requerido por tus modelos)
 sex_male = 1 if sex == "Masculino" else 0
 embarked_q = 1 if embarked == "Queenstown (Q)" else 0
 embarked_s = 1 if embarked == "Southampton (S)" else 0
 
+# Crear DataFrame estructurado
 input_data = pd.DataFrame([{
-    'Pclass': pclass, 'Age': age, 'SibSp': sibsp, 'Parch': parch, 
-    'Fare': fare, 'Sex_male': sex_male, 'Embarked_Q': embarked_q, 'Embarked_S': embarked_s
+    'Pclass': pclass, 
+    'Age': age, 
+    'SibSp': sibsp, 
+    'Parch': parch, 
+    'Fare': fare, 
+    'Sex_male': sex_male, 
+    'Embarked_Q': embarked_q, 
+    'Embarked_S': embarked_s
 }])
 
 st.markdown("---")
 
+# Botón para ejecutar la predicción
 if st.button("🔮 Calcular Supervivencia"):
     if model is not None:
         try:
+            # Predicción
             prediction = model.predict(input_data)[0]
+            
+            # Mostrar resultados estilizados
+            st.subheader("Resultado:")
             if prediction == 1:
-                st.success("🎉 ¡Sobreviviste!")
+                st.success("🎉 ¡Felicidades! Según el modelo, hubieras **SOBREVIVIDO** al desastre.")
             else:
-                st.error("💔 No sobreviviste.")
+                st.error("💔 Lamentablemente, según el modelo, **NO HUBIERAS SOBREVIVIDO**.")
+                
+            with st.expander("Ver datos enviados al modelo"):
+                st.dataframe(input_data)
+                
         except Exception as e:
-            st.error(f"Error en la predicción: {e}")
+            st.error(f"Hubo un problema al procesar los datos con el modelo: {e}")
     else:
-        st.warning("El modelo no está cargado.")
+        st.warning("El modelo no está disponible actualmente debido al error de carga de arriba.")
