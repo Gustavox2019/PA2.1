@@ -94,6 +94,6 @@ col_left, col_center, col_right = st.columns([1, 2, 1])
 with col_center:
     st.link_button(
         label="🚀 Ir a Google Colab", 
-        url="https://colab.research.google.com/drive/1qjsKGqGPF5bIKJa_9n3DVZ3em6LyMEth?usp=sharing",
+        url="https://colab.research.google.com/drive/1QIr9czxwDVD_K3PuQKgVbMEStDGq-tGm?usp=sharing",
         use_container_width=True
     )
